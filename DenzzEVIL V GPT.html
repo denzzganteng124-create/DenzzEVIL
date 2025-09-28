@@ -1,0 +1,295 @@
+<!doctype html>
+
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Prank Bug WhatsApp - DenzzEVIL</title>
+  <style>
+    :root{
+      --bg:#000;
+      --neon:#ff1a1a;
+      --muted:rgba(255,255,255,0.06);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+      background:var(--bg);
+      color:#fff;
+      overflow:hidden;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+    }/* floating gradient blobs for subtle animation */
+.bg-blob{position:fixed; inset:0; z-index:0; pointer-events:none}
+.blob{
+  position:absolute; width:420px; height:420px; filter:blur(60px); opacity:0.08; border-radius:50%;
+  mix-blend-mode:screen;
+  animation:float 10s ease-in-out infinite;
+}
+.blob.a{left:-100px; top:-60px; background:linear-gradient(135deg,#ff0000 0%, #ff6b6b 100%);}
+.blob.b{right:-120px; bottom:-80px; background:linear-gradient(45deg,#ff1a1a 0%, #ff7b7b 100%); animation-duration:12s}
+@keyframes float{0%{transform:translateY(0) translateX(0)}50%{transform:translateY(-20px) translateX(20px)}100%{transform:translateY(0) translateX(0)}}
+
+.card{
+  position:relative; z-index:2; width:100%; max-width:420px; padding:28px; border-radius:18px;
+  background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+  border:1px solid rgba(255,0,0,0.06);
+  backdrop-filter: blur(6px);
+}
+
+.title{
+  text-align:center; margin:6px 0 12px; font-weight:800; letter-spacing:2px; font-size:36px;
+  color:var(--neon);
+  text-shadow: 0 0 8px rgba(255,26,26,0.9), 0 0 20px rgba(255,26,26,0.6);
+  transform:translateY(-6px);
+  animation:glow 1.8s ease-in-out infinite;
+}
+@keyframes glow{
+  0%{text-shadow: 0 0 6px rgba(255,26,26,0.6), 0 0 12px rgba(255,26,26,0.3)}
+  50%{text-shadow: 0 0 14px rgba(255,26,26,1), 0 0 30px rgba(255,26,26,0.7)}
+  100%{text-shadow: 0 0 6px rgba(255,26,26,0.6), 0 0 12px rgba(255,26,26,0.3)}
+}
+.subtitle{color:var(--neon); text-align:center; margin-bottom:18px; opacity:0.95}
+
+form{display:flex; flex-direction:column; gap:12px}
+label{font-size:13px; color:#ffdad1}
+input[type=text], input[type=password]{
+  width:100%; padding:12px 14px; border-radius:10px; border:1px solid rgba(255,255,255,0.06);
+  background:rgba(255,255,255,0.02); color:#fff; outline:none; font-size:15px;
+  box-shadow: inset 0 -6px 18px rgba(0,0,0,0.4);
+  transition:transform .18s ease;
+}
+input::placeholder{color:rgba(255,255,255,0.38)}
+input:focus{transform:translateY(-2px); box-shadow:0 8px 30px rgba(0,0,0,0.6);}
+
+.btn{appearance:none; border:0; padding:10px 14px; border-radius:10px; cursor:pointer; font-weight:700; letter-spacing:1px}
+.btn.neon{background:linear-gradient(90deg,#ff1a1a,#ff6b6b); color:#fff; box-shadow: 0 6px 30px rgba(255,26,26,0.18), 0 0 18px rgba(255,26,26,0.12)}
+
+.muted{font-size:13px; color:rgba(255,255,255,0.42); text-align:center}
+
+/* small animated indicator under title */
+.spark{height:6px; width:80px; margin:12px auto 20px; border-radius:999px; background:linear-gradient(90deg,#ff1a1a,#ff6b6b); box-shadow:0 6px 20px rgba(255,26,26,0.12); animation:bar 1.6s linear infinite}
+@keyframes bar{0%{transform:scaleX(0.2)}50%{transform:scaleX(1)}100%{transform:scaleX(0.2)}}
+
+/* pages */
+.page{display:none}
+.page.active{display:block}
+
+.center{display:flex; align-items:center; justify-content:center}
+
+/* menu choices */
+.menu{display:flex; gap:10px; margin:8px 0 10px}
+.menu button{flex:1}
+
+/* progress */
+.progress-wrap{background:rgba(255,255,255,0.02); border-radius:12px; padding:10px}
+.progress-bar{height:18px; width:0%; border-radius:10px; background:linear-gradient(90deg,#ff1a1a,#ff6b6b); box-shadow:0 8px 20px rgba(255,26,26,0.08)}
+.progress-text{margin-top:8px; text-align:center; font-weight:700}
+
+footer small{display:block; text-align:center; margin-top:12px; color:rgba(255,255,255,0.18)}
+
+/* responsive */
+@media (max-width:420px){ .card{padding:18px} .title{font-size:30px}}
+
+  </style>
+</head>
+<body>
+  <div class="bg-blob" aria-hidden>
+    <div class="blob a"></div>
+    <div class="blob b"></div>
+  </div>  <div class="card" role="main">
+    <!-- Page: Login -->
+    <div id="page-login" class="page">
+      <div class="title">DenzzEVIL</div>
+      <div class="subtitle">Selamat datang, jangan di salah gunakan yaa:)</div>
+      <div class="spark" aria-hidden></div><form id="loginForm" autocomplete="off">
+    <label for="u">Username</label>
+    <input id="u" type="text" placeholder="Masukkan username" required />
+
+    <label for="p">Password</label>
+    <input id="p" type="password" placeholder="Masukkan password" required />
+
+    <button type="submit" class="btn neon">Enter</button>
+    <div id="loginMsg" class="muted" aria-live="polite"></div>
+  </form>
+  <footer><small>by denzz</small></footer>
+</div>
+
+<!-- Page: Home (after login) -->
+<div id="page-home" class="page">
+  <div class="title" id="homeTitle">Selamat datang</div>
+  <div style="text-align:center;margin-bottom:14px">Aplikasi siap. Tekan next untuk melanjutkan.</div>
+  <div class="center"><button id="nextBtn" class="btn neon">Next</button></div>
+</div>
+
+<!-- Page: Menu -->
+<div id="page-menu" class="page">
+  <div class="title">DenzzEVIL</div>
+  <div style="margin-bottom:8px">Pilih salah satu menu:</div>
+  <div class="menu">
+    <button class="btn" data-mode="Crash Infinity">Crash Infinity</button>
+    <button class="btn" data-mode="Delay Invisible">Delay Invisible</button>
+    <button class="btn" data-mode="Ios Crash">Ios Crash</button>
+  </div>
+  <div style="margin-top:12px">
+    <label for="target">Masukkan nomor target</label>
+    <input id="target" type="text" placeholder="0812xxxxxxxx" />
+    <div style="height:10px"></div>
+    <div class="center"><button id="startBtn" class="btn neon">Enter</button></div>
+    <div id="modeNote" class="muted" style="margin-top:8px"></div>
+  </div>
+</div>
+
+<!-- Page: Progress -->
+<div id="page-progress" class="page">
+  <div class="title">Sedang menjalankan</div>
+  <div class="progress-wrap">
+    <div id="bar" class="progress-bar" style="width:0%"></div>
+  </div>
+  <div class="progress-text" id="pct">0%</div>
+</div>
+
+<!-- Page: Done -->
+<div id="page-done" class="page">
+  <div class="title">Nomor target berhasil di bug</div>
+  <div style="text-align:center; margin-top:10px">Operasi selesai.</div>
+  <div style="height:12px"></div>
+  <div class="center"><button id="exitBtn" class="btn neon">Exit</button></div>
+</div>
+
+  </div>  <script>
+    // --- NOTE: password is checked client-side for the prank. Do not reveal it here in the UI.
+    const SECRET = 'denzzgantenganjay'; // (kept in code intentionally as requested by user)
+
+    // pages
+    const pages = {
+      login: document.getElementById('page-login'),
+      home: document.getElementById('page-home'),
+      menu: document.getElementById('page-menu'),
+      progress: document.getElementById('page-progress'),
+      done: document.getElementById('page-done')
+    };
+
+    function show(page){
+      Object.values(pages).forEach(p=>p.classList.remove('active'));
+      pages[page].classList.add('active');
+    }
+
+    // Persist login: if localStorage has loggedIn username, skip login
+    function init(){
+      const user = localStorage.getItem('prank_user');
+      if(user){
+        setHomeUser(user);
+        show('home');
+      } else {
+        show('login');
+      }
+    }
+
+    // login form
+    const loginForm = document.getElementById('loginForm');
+    const loginMsg = document.getElementById('loginMsg');
+    loginForm.addEventListener('submit', e=>{
+      e.preventDefault();
+      const username = document.getElementById('u').value.trim() || 'User';
+      const pwd = document.getElementById('p').value;
+      if(pwd !== SECRET){
+        loginMsg.textContent = 'password salah';
+        loginMsg.style.color = '#ff8b8b';
+        shake(loginForm);
+        return;
+      }
+      // success
+      localStorage.setItem('prank_user', username);
+      setHomeUser(username);
+      show('home');
+    });
+
+    function setHomeUser(name){
+      const title = document.getElementById('homeTitle');
+      title.textContent = `Selamat datang ${name}`;
+    }
+
+    document.getElementById('nextBtn').addEventListener('click', ()=>{
+      // go to menu
+      show('menu');
+    });
+
+    // menu selection
+    let chosenMode = null;
+    document.querySelectorAll('#page-menu .menu button').forEach(b=>{
+      b.addEventListener('click', ()=>{
+        document.querySelectorAll('#page-menu .menu button').forEach(x=>x.classList.remove('neon'));
+        b.classList.add('neon');
+        chosenMode = b.dataset.mode;
+        document.getElementById('modeNote').textContent = `Mode dipilih: ${chosenMode}`;
+      });
+    });
+
+    document.getElementById('startBtn').addEventListener('click', ()=>{
+      const target = document.getElementById('target').value.trim();
+      if(!chosenMode){
+        alert('Pilih mode terlebih dahulu');
+        return;
+      }
+      if(!target){
+        alert('Masukkan nomor target');
+        return;
+      }
+      // proceed to fake progress
+      show('progress');
+      runProgress(()=>{
+        show('done');
+      });
+    });
+
+    function runProgress(onComplete){
+      const bar = document.getElementById('bar');
+      const pct = document.getElementById('pct');
+      let value = 0;
+      // realistic looking non-linear progress
+      const steps = [1,1,2,3,2,1,4,6,8,12,9,6,5,3,2,4,6,8];
+      let i = 0;
+      const id = setInterval(()=>{
+        const add = steps[Math.min(i, steps.length-1)];
+        value = Math.min(100, value + add);
+        bar.style.width = value + '%';
+        pct.textContent = value + '%';
+        i++;
+        if(value >= 100){
+          clearInterval(id);
+          setTimeout(onComplete, 700);
+        }
+      }, 180);
+    }
+
+    document.getElementById('exitBtn').addEventListener('click', ()=>{
+      // go back to home (page 2)
+      show('home');
+    });
+
+    // simple shake for error
+    function shake(el){
+      el.animate([{transform:'translateX(0)'},{transform:'translateX(-8px)'},{transform:'translateX(8px)'},{transform:'translateX(0)'}], {duration:360});
+    }
+
+    // keyboard convenience: enter on progress does nothing
+    document.addEventListener('keydown', e=>{
+      if(e.key === 'Escape'){
+        // quick logout
+        localStorage.removeItem('prank_user');
+        show('login');
+      }
+    });
+
+    // kick off
+    init();
+  </script></body>
+</html>
